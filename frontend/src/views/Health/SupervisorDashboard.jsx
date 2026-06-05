@@ -1,15 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import QRCode from 'react-qr-code';
 import {
   sterilizationProtocols,
   bioWasteRecords,
   personalProtectiveEquipment,
   disinfectionAreas,
   incidents,
+  certificates,
+  qrConfig,
 } from './data/healthDatasets';
 
 export default function SupervisorDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedArea, setSelectedArea] = useState(null);
+  const [certModal, setCertModal] = useState(false);
+  const [createdCert, setCreatedCert] = useState(null);
+  const qrRef = useRef(null);
 
   const calculateOverallHygiene = () => {
     const areas = disinfectionAreas;
@@ -38,12 +44,113 @@ export default function SupervisorDashboard() {
   const lowEPPItems = personalProtectiveEquipment.filter((item) => item.status !== 'optimal');
   const activeIncidents = incidents.filter((inc) => inc.status !== 'resolved');
 
+  const issueCertificate = () => {
+    const id = `cert-${Date.now()}`;
+    const cert = {
+      id,
+      date: new Date(),
+      issuer: 'Supervisor Dashboard',
+      clinicName: qrConfig.publicQR.clinicName || 'Clínica',
+      score: overallScore,
+      validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    };
+    certificates.unshift(cert);
+    setCreatedCert(cert);
+    setCertModal(true);
+    // prepare a verification URL encoded as payload
+    const payload = btoa(JSON.stringify({ type: 'certificate', id: cert.id }));
+    const verifyUrl = `${window.location.origin}/verify?payload=${payload}`;
+    setTimeout(() => {
+      // replace QR value shown in modal by updating createdCert (add verifyUrl)
+      setCreatedCert((c) => ({ ...c, verifyUrl }));
+    }, 0);
+  };
+
+  const printCertificate = (cert) => {
+    try {
+      const qrSvg = qrRef.current ? qrRef.current.innerHTML : '';
+      const win = window.open('', '_blank', 'width=700,height=900');
+      if (!win) return alert('Permite ventanas emergentes para imprimir.');
+      const html = `
+        <!doctype html>
+        <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Certificado - ${cert.id}</title>
+          <style>
+            body { font-family: Arial, Helvetica, sans-serif; padding: 24px; color:#0f172a; background:#f8fafc }
+            .card { border-radius:10px; max-width:800px; margin:0 auto; overflow:hidden; box-shadow:0 6px 18px rgba(2,6,23,0.08) }
+            .banner { background:linear-gradient(90deg,#ecfccb,#bbf7d0); padding:20px 24px; display:flex; justify-content:space-between; align-items:center }
+            .title { font-size:22px; font-weight:800; color:#065f46 }
+            .issuer { font-size:13px; color:#065f46; opacity:0.9 }
+            .body { background:#fff; padding:24px; display:flex; gap:18px }
+            .left { flex:1 }
+            .right { width:180px; text-align:center }
+            .clinic { font-size:18px; font-weight:700; color:#0f172a }
+            .meta { font-size:14px; color:#374151; margin-top:8px }
+            .score { font-size:36px; color:#16a34a; font-weight:800 }
+            .small { font-size:12px; color:#6b7280 }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <div class="banner">
+              <div>
+                <div class="title">Certificado de Bioseguridad</div>
+                <div class="issuer">Emitido por: ${cert.issuer}</div>
+              </div>
+              <div style="text-align:right">
+                <div class="small">ID: ${cert.id}</div>
+                <div class="small">Válido hasta: ${new Date(cert.validUntil).toLocaleDateString('es-MX')}</div>
+              </div>
+            </div>
+            <div class="body">
+              <div class="left">
+                <div class="clinic">${cert.clinicName}</div>
+                <div class="meta">Certificado que acredita el cumplimiento de buenas prácticas de bioseguridad en la operación clínica.</div>
+                <div style="margin-top:16px">
+                  <div class="meta"><strong>Emitido:</strong> ${new Date(cert.date).toLocaleString('es-MX')}</div>
+                  <div class="meta"><strong>Score:</strong> <span class="score">${cert.score}%</span></div>
+                </div>
+              </div>
+              <div class="right">
+                <div class="small">Escanea para verificar</div>
+                <div style="margin-top:8px">${qrSvg}</div>
+              </div>
+            </div>
+            <div style="padding:12px 24px; text-align:center; background:#fff">
+              <div class="small">Verifique la validez en el sistema escaneando el código QR o visitando la interfaz de verificación.</div>
+            </div>
+          </div>
+          <script>
+            setTimeout(() => { window.print(); setTimeout(()=>window.close(),500); }, 250);
+          </script>
+        </body>
+        </html>
+      `;
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+    } catch (e) {
+      console.error('print error', e);
+      alert('Error al generar impresión');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard Supervisor de Salud</h1>
         <p className="text-gray-600">Control integral de protocolos de bioseguridad clínica</p>
+        <div className="mt-4">
+          <button
+            onClick={issueCertificate}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+          >
+            🏷️ Emitir Certificado Rápido
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -136,6 +243,61 @@ export default function SupervisorDashboard() {
         </div>
 
         <div className="p-6">
+          {/* Certificate modal */}
+          {certModal && createdCert && (
+            <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-2xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-green-700">Certificado de Bioseguridad</h3>
+                    <p className="text-sm text-gray-500">Emitido por: {createdCert.issuer}</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-gray-400">ID</div>
+                    <div className="font-mono font-semibold">{createdCert.id}</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                  <div className="md:col-span-2">
+                    <div className="bg-gradient-to-r from-white to-green-50 rounded p-4 border border-green-100">
+                      <h4 className="text-lg font-semibold text-gray-900">{createdCert.clinicName}</h4>
+                      <p className="text-sm text-gray-600 mt-1">Certificado de cumplimiento de buenas prácticas de bioseguridad.</p>
+                      <div className="mt-3 flex items-center gap-4">
+                        <div className="flex items-baseline gap-2">
+                          <div className="text-3xl font-bold text-green-600">{createdCert.score}%</div>
+                          <div className="text-sm text-gray-500">Puntuación</div>
+                        </div>
+                        <div className="text-sm text-gray-500">Válido hasta: <span className="font-semibold text-gray-700">{new Date(createdCert.validUntil).toLocaleDateString('es-MX')}</span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-center">
+                    <div ref={qrRef} className="bg-white p-2 rounded shadow">
+                      <QRCode value={createdCert.verifyUrl || JSON.stringify({ type: 'certificate', id: createdCert.id })} size={160} />
+                    </div>
+                    <div className="text-xs text-gray-500 mt-2">Escanea para verificar</div>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    onClick={() => printCertificate(createdCert)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                  >
+                    Imprimir
+                  </button>
+                  <button
+                    onClick={() => setCertModal(false)}
+                    className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 transition"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div>
