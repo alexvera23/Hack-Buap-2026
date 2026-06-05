@@ -5,6 +5,7 @@ import HealthSemaphore from './components/HealthSemaphore'
 import CertificationPanel from './components/CertificationPanel'
 import { Shield, Activity, ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import Footer from '../../components/Footer' // <-- Importación limpia
 
 export default function AnimalCareDashboard() {
   const navigate = useNavigate()
@@ -68,6 +69,7 @@ export default function AnimalCareDashboard() {
             lastSanitization={farmData.lastSanitization}
             onUpdateProgress={(val) => setFarmData(prev => ({ ...prev, vaccinationProgress: val }))}
           />
+         
         </div>
 
         {/* Columna de Certificación y Cara al Público (Derecha) */}
@@ -75,8 +77,9 @@ export default function AnimalCareDashboard() {
           <HealthSemaphore data={farmData} />
           <CertificationPanel data={farmData} />
         </div>
-
       </div>
+       <Footer modulo="Bioseguridad Zoosanitaria (Cuidado Animal)" />
     </div>
+    
   )
 }
