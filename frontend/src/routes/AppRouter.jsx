@@ -2,7 +2,7 @@ import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from '../views/Home/Home'
 import Agriculture from '../views/Agriculture/Agriculture'
-import AnimalCare from '../views/AnimalCare/AnimalCareDashboard'
+import AnimalCare from '../views/AnimalCare/AnimalCare'
 import Health from '../views/Health/Health'
 import Verify from '../views/Health/Verify'
 
