@@ -77,36 +77,6 @@ export default function Health() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white mt-12 py-8">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <h3 className="font-bold text-lg mb-3">Sobre este Módulo</h3>
-              <p className="text-gray-400 text-sm">
-                Sistema integral de bioseguridad clínica para controlar protocolos de esterilización,
-                EPP y residuos biológico-infecciosos.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-bold text-lg mb-3">Características</h3>
-              <ul className="text-gray-400 text-sm space-y-2">
-                <li>✓ Dashboard en tiempo real</li>
-                <li>✓ Gamificación y medallas</li>
-                <li>✓ QR público para clientes</li>
-                <li>✓ Análisis histórico</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-bold text-lg mb-3">Datasets Incluidos</h3>
-              <ul className="text-gray-400 text-sm space-y-2">
-                <li>📋 Protocolos de esterilización</li>
-                <li>🗑️ Registros de RPBI</li>
-                <li>🛡️ Inventario de EPP</li>
-                <li>📊 Métricas de clientes</li>
-              </ul>
-            </div>
-          </div>
-
           <div className="border-t border-gray-700 pt-6 text-center text-gray-400 text-sm">
             <p>
               Hack BUAP 2026 - Soluciones en Salud Humana | Módulo: Bioseguridad Clínica y Comercial
