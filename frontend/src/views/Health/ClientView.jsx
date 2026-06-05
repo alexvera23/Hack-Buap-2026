@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import QRCode from 'react-qr-code';
 import { disinfectionAreas, qrConfig } from './data/healthDatasets';
 
 export default function ClientView() {
@@ -25,6 +26,9 @@ export default function ClientView() {
   };
 
   const clinic = qrConfig.publicQR;
+  // produce a verification URL so scanned QR opens the verify page
+  const clinicPayload = btoa(JSON.stringify({ type: 'clinic', id: clinic.id }));
+  const qrValue = `${typeof window !== 'undefined' ? window.location.origin : ''}/verify?payload=${clinicPayload}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
@@ -47,9 +51,12 @@ export default function ClientView() {
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Código QR - Verificación de Higiene</h3>
             <div className="bg-gray-100 rounded-lg p-6 flex items-center justify-center mb-4 h-48">
               <div className="text-center">
-                <div className="text-5xl mb-2">📷</div>
-                <p className="text-gray-600 text-sm">QR Interactivo</p>
+                <div className="inline-block bg-white p-2 rounded shadow-sm">
+                  <QRCode value={qrValue} size={150} />
+                </div>
+                <p className="text-gray-600 text-sm mt-3">QR Interactivo</p>
                 <p className="text-xs text-gray-500 mt-2">ID: {clinic.id}</p>
+                <p className="text-xs text-gray-500">Válido hasta: {new Date(clinic.validUntil).toLocaleDateString('es-MX')}</p>
               </div>
             </div>
             <p className="text-sm text-gray-600">

@@ -296,3 +296,37 @@ export const qrConfig = {
     validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
   },
 };
+
+// Certificados emitidos (demo/local)
+export const certificates = [];
+
+// Guías simplificadas para cumplimiento (para mostrar en UI paso a paso)
+export const guidelines = [
+  {
+    id: 'g-sterilization',
+    title: 'Esterilización básica',
+    steps: [
+      { id: 'g-s-1', text: 'Limpia superficies visibles con detergente.', done: false },
+      { id: 'g-s-2', text: 'Aplica desinfectante recomendado y deja actuar 5 minutos.', done: false },
+      { id: 'g-s-3', text: 'Registra el ciclo en el sistema y marca hora.', done: false },
+    ],
+  },
+  {
+    id: 'g-epp',
+    title: 'Manejo de EPP',
+    steps: [
+      { id: 'g-e-1', text: 'Verifica stock mínimo diario antes de abrir.', done: false },
+      { id: 'g-e-2', text: 'Asegura uso correcto de guantes y mascarillas en área de riesgo.', done: false },
+      { id: 'g-e-3', text: 'Desecha EPP en contenedores RPBI adecuados.', done: false },
+    ],
+  },
+  {
+    id: 'g-cleaning',
+    title: 'Rutina rápida de cierre',
+    steps: [
+      { id: 'g-c-1', text: 'Barre y desinfecta mostradores.', done: false },
+      { id: 'g-c-2', text: 'Revisa fechas de caducidad de suministros.', done: false },
+      { id: 'g-c-3', text: 'Genera reporte breve y súbelo al sistema.', done: false },
+    ],
+  },
+];
