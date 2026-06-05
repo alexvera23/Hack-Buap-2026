@@ -2,9 +2,30 @@ import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
 import { disinfectionAreas, qrConfig } from './data/healthDatasets';
 
+const evaluationOptions = [
+  { value: 'pass', label: 'Cumple', delta: 3 },
+  { value: 'partial', label: 'Parcial', delta: 0 },
+  { value: 'fail', label: 'No cumple', delta: -7 },
+];
+
+const areaCriteria = [
+  { key: 'ppe', label: 'Uso correcto de EPP' },
+  { key: 'disinfection', label: 'Desinfección según protocolo' },
+  { key: 'documentation', label: 'Registros de limpieza al día' },
+];
+
 export default function ClientView() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showQRInfo, setShowQRInfo] = useState(false);
+  const [evaluations, setEvaluations] = useState(() => {
+    return disinfectionAreas.reduce((acc, area) => {
+      acc[area.id] = areaCriteria.reduce((criteria, item) => {
+        criteria[item.key] = 'pass';
+        return criteria;
+      }, {});
+      return acc;
+    }, {});
+  });
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -23,6 +44,30 @@ export default function ClientView() {
     if (score >= 80) return { text: 'Bueno', color: '#3B82F6' };
     if (score >= 70) return { text: 'Aceptable', color: '#F59E0B' };
     return { text: 'Requiere Atención', color: '#EF4444' };
+  };
+
+  const getScoreAdjustment = (areaId) => {
+    const selected = evaluations[areaId] || {};
+    return Object.values(selected).reduce((sum, value) => {
+      const option = evaluationOptions.find((item) => item.value === value);
+      return sum + (option?.delta || 0);
+    }, 0);
+  };
+
+  const getAdjustedScore = (area) => {
+    const adjustment = getScoreAdjustment(area.id);
+    const adjusted = Math.min(100, Math.max(0, area.hygienScore + adjustment));
+    return adjusted;
+  };
+
+  const handleEvaluationChange = (areaId, criterionKey, value) => {
+    setEvaluations((prev) => ({
+      ...prev,
+      [areaId]: {
+        ...prev[areaId],
+        [criterionKey]: value,
+      },
+    }));
   };
 
   const clinic = qrConfig.publicQR;
@@ -86,7 +131,8 @@ export default function ClientView() {
           {disinfectionAreas.map((area) => {
             const timeAgo = Math.round((Date.now() - area.lastDisinfection) / (60 * 1000));
             const statusDisplay = getStatusDisplay(area.status);
-            const hygienStatus = getHygienStatusBar(area.hygienScore);
+            const adjustedScore = getAdjustedScore(area);
+            const hygienStatus = getHygienStatusBar(adjustedScore);
 
             return (
               <div
@@ -126,7 +172,7 @@ export default function ClientView() {
                         className="text-2xl font-bold"
                         style={{ color: hygienStatus.color }}
                       >
-                        {area.hygienScore}%
+                        {getAdjustedScore(area)}%
                       </span>
                       <span
                         className="text-sm px-2 py-1 rounded font-semibold"
@@ -143,11 +189,34 @@ export default function ClientView() {
                     <div
                       className="h-full transition-all"
                       style={{
-                        width: `${area.hygienScore}%`,
+                        width: `${getAdjustedScore(area)}%`,
                         backgroundColor: hygienStatus.color,
                       }}
                     ></div>
                   </div>
+                </div>
+
+                {/* Evaluation Selectors */}
+                <div className="space-y-4 pt-4 border-t border-gray-200">
+                  <h4 className="text-sm font-semibold text-gray-900">Evaluación de características</h4>
+                  {areaCriteria.map((criterion) => (
+                    <div key={criterion.key} className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                      <div>
+                        <p className="text-xs text-gray-600">{criterion.label}</p>
+                      </div>
+                      <select
+                        value={evaluations[area.id]?.[criterion.key] ?? 'pass'}
+                        onChange={(event) => handleEvaluationChange(area.id, criterion.key, event.target.value)}
+                        className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:outline-none"
+                      >
+                        {evaluationOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
                 </div>
 
                 {/* Disinfection Details */}

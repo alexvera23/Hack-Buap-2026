@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { BarChart3, TrendingUp, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { hygienicScoreHistory, clientMetrics } from './data/healthDatasets';
 
 export default function HealthIndicators() {
-  const [chartType, setChartType] = useState('line');
-
-  // Simular datos de gráfico
   const generateChartData = () => {
     return hygienicScoreHistory.map((item) => ({
       date: item.date.toLocaleDateString('es-MX', { month: 'short', day: 'numeric' }),
@@ -17,21 +15,44 @@ export default function HealthIndicators() {
   const minScore = Math.min(...chartData.map((d) => d.score));
   const avgScore = Math.round(chartData.reduce((sum, d) => sum + d.score, 0) / chartData.length);
 
+  const chartWidth = 720;
+  const chartHeight = 220;
+  const leftPadding = 50;
+  const bottomPadding = 30;
+  const innerWidth = chartWidth - leftPadding - 20;
+  const innerHeight = chartHeight - bottomPadding - 20;
+
+  const chartPoints = chartData.map((data, idx) => {
+    const x = leftPadding + (innerWidth / (chartData.length - 1)) * idx;
+    const y = 20 + innerHeight - ((data.score - minScore) / (maxScore - minScore || 1)) * innerHeight;
+    return `${x},${y}`;
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">📊 Indicadores de Salud</h1>
+          <div className="flex items-center gap-3 mb-3">
+            <BarChart3 className="w-7 h-7 text-green-700" />
+            <h1 className="text-4xl font-bold text-gray-900">Indicadores de Salud</h1>
+          </div>
           <p className="text-gray-600">Análisis histórico y tendencias de bioseguridad</p>
         </div>
 
         {/* KPI Summary */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600 text-sm font-medium">Puntuación Promedio</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">{avgScore}%</p>
-            <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Puntuación Promedio</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{avgScore}%</p>
+              </div>
+              <div className="text-green-700 bg-green-100 rounded-full p-2">
+                <TrendingUp className="w-6 h-6" />
+              </div>
+            </div>
+            <div className="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
                 className="h-full"
                 style={{
@@ -48,24 +69,46 @@ export default function HealthIndicators() {
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600 text-sm font-medium">Puntuación Máxima</p>
-            <p className="text-3xl font-bold text-green-600 mt-2">{maxScore}%</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Puntuación Máxima</p>
+                <p className="text-3xl font-bold text-green-600 mt-2">{maxScore}%</p>
+              </div>
+              <div className="text-green-700 bg-green-100 rounded-full p-2">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+            </div>
             <p className="text-xs text-gray-500 mt-2">Mejor registro</p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600 text-sm font-medium">Puntuación Mínima</p>
-            <p className="text-3xl font-bold text-orange-600 mt-2">{minScore}%</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Puntuación Mínima</p>
+                <p className="text-3xl font-bold text-orange-600 mt-2">{minScore}%</p>
+              </div>
+              <div className="text-orange-700 bg-orange-100 rounded-full p-2">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+            </div>
             <p className="text-xs text-gray-500 mt-2">Peor registro</p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600 text-sm font-medium">Tendencia</p>
-            <div className="flex items-end gap-1 mt-2 h-12">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Tendencia</p>
+                <p className="text-sm text-gray-500 mt-1">Basado en los últimos registros de higiene</p>
+              </div>
+              <div className="text-blue-700 bg-blue-100 rounded-full p-2">
+                <BarChart3 className="w-6 h-6" />
+              </div>
+            </div>
+            <div className="mt-4 h-24 bg-gray-100 rounded-lg overflow-hidden flex items-end gap-1">
               {chartData.slice(-7).map((d, idx) => (
                 <div
                   key={idx}
-                  className="flex-1 bg-gradient-to-t rounded-t"
+                  className="flex-1 rounded-t-lg"
                   style={{
                     height: `${(d.score / 100) * 100}%`,
                     backgroundColor:
@@ -86,96 +129,62 @@ export default function HealthIndicators() {
         {/* Chart */}
         <div className="bg-white rounded-lg shadow p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Evolución de Puntuación de Higiene</h2>
-            <div className="flex gap-2">
-              {['line', 'bar', 'area'].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setChartType(type)}
-                  className={`px-4 py-2 rounded font-medium text-sm transition-colors ${
-                    chartType === type
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  {type === 'line' ? '📈' : type === 'bar' ? '📊' : '📉'}
-                </button>
-              ))}
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Evolución de Puntuación de Higiene</h2>
+              <p className="text-sm text-gray-500">Gráfica estática con el seguimiento de la higiene en el tiempo.</p>
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-2 text-sm text-gray-700">
+              <TrendingUp className="w-4 h-4" /> Evolución
             </div>
           </div>
 
-          {/* Chart Area */}
-          <div className="relative h-80 mb-6 flex items-end gap-1 p-4 border border-gray-200 rounded-lg bg-gray-50">
-            {chartData.map((data, idx) => {
-              const height = (data.score / 100) * 100;
-              const isLine = chartType === 'line' || chartType === 'area';
-
-              return (
-                <div key={idx} className="flex-1 flex flex-col items-center relative group">
-                  {/* Dot for line chart */}
-                  {isLine && (
-                    <div
-                      className="absolute w-2 h-2 bg-green-600 rounded-full"
-                      style={{
-                        bottom: `${height}%`,
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                      }}
-                    ></div>
-                  )}
-
-                  {/* Bar or Area */}
-                  <div
-                    className={`w-full ${chartType === 'line' ? '' : 'flex-1'} flex flex-col justify-end items-center group`}
-                    style={{
-                      height: chartType === 'line' ? '100%' : 'auto',
-                    }}
-                  >
-                    {chartType !== 'line' && (
-                      <div
-                        className={`w-full rounded-t transition-all hover:opacity-80 ${
-                          chartType === 'area' ? 'opacity-70' : ''
-                        }`}
-                        style={{
-                          height: `${height}%`,
-                          backgroundColor:
-                            data.score >= 90
-                              ? '#10B981'
-                              : data.score >= 75
-                                ? '#3B82F6'
-                                : '#F59E0B',
-                        }}
-                      ></div>
-                    )}
-                  </div>
-
-                  {/* Label */}
-                  <div className="absolute bottom-0 transform translate-y-full mt-2 text-xs text-gray-600 font-medium">
-                    {data.date}
-                  </div>
-
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-900 text-white px-2 py-1 rounded text-xs whitespace-nowrap z-10">
-                    {data.score}%
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Legend */}
-          <div className="flex items-center justify-center gap-6 pt-4 border-t border-gray-200">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-600 rounded"></div>
-              <span className="text-sm text-gray-600">Excelente (≥90%)</span>
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-6">
+            <div className="overflow-x-auto">
+              <svg viewBox="0 0 720 260" className="w-full h-80">
+                <defs>
+                  <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#16a34a" stopOpacity="0.9" />
+                    <stop offset="100%" stopColor="#16a34a" stopOpacity="0.08" />
+                  </linearGradient>
+                </defs>
+                <line x1={leftPadding} y1={20} x2={leftPadding} y2={chartHeight - bottomPadding} stroke="#cbd5e1" strokeWidth={1} />
+                <line x1={leftPadding} y1={chartHeight - bottomPadding} x2={chartWidth - 20} y2={chartHeight - bottomPadding} stroke="#cbd5e1" strokeWidth={1} />
+                <polyline fill="url(#lineGradient)" stroke="#16a34a" strokeWidth={4} points={chartPoints} opacity={0.8} />
+                {chartData.map((data, idx) => {
+                  const x = leftPadding + (innerWidth / (chartData.length - 1)) * idx;
+                  const y = 20 + innerHeight - ((data.score - minScore) / (maxScore - minScore || 1)) * innerHeight;
+                  return (
+                    <g key={idx}>
+                      <circle cx={x} cy={y} r={4} fill="#16a34a" />
+                      <text x={x} y={y - 10} textAnchor="middle" fontSize={12} fill="#334155">
+                        {data.score}%
+                      </text>
+                    </g>
+                  );
+                })}
+                {chartData.map((data, idx) => {
+                  const x = leftPadding + (innerWidth / (chartData.length - 1)) * idx;
+                  return (
+                    <text key={idx} x={x} y={250} textAnchor="middle" fontSize={12} fill="#64748b">
+                      {data.date}
+                    </text>
+                  );
+                })}
+              </svg>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-blue-600 rounded"></div>
-              <span className="text-sm text-gray-600">Bueno (75-89%)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-amber-600 rounded"></div>
-              <span className="text-sm text-gray-600">Aceptable (&lt;75%)</span>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+              <div className="rounded-lg bg-white p-4 border border-gray-200">
+                <p className="font-semibold text-gray-900">Puntuación Promedio</p>
+                <p>{avgScore}%</p>
+              </div>
+              <div className="rounded-lg bg-white p-4 border border-gray-200">
+                <p className="font-semibold text-gray-900">Máximo</p>
+                <p>{maxScore}%</p>
+              </div>
+              <div className="rounded-lg bg-white p-4 border border-gray-200">
+                <p className="font-semibold text-gray-900">Mínimo</p>
+                <p>{minScore}%</p>
+              </div>
             </div>
           </div>
         </div>
@@ -233,7 +242,9 @@ export default function HealthIndicators() {
         {/* Insights */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
-            <h3 className="font-bold text-blue-900 mb-3">📌 Insight Positivo</h3>
+            <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5" /> Insight Positivo
+            </h3>
             <p className="text-sm text-blue-800">
               Tu puntuación de higiene ha mejorado en un <strong>10%</strong> en las últimas 2 semanas.
               La confianza de los pacientes también ha aumentado, resultando en más reincidencias.
@@ -241,7 +252,9 @@ export default function HealthIndicators() {
           </div>
 
           <div className="bg-yellow-50 rounded-lg p-6 border border-yellow-200">
-            <h3 className="font-bold text-yellow-900 mb-3">⚠️ Recomendación</h3>
+            <h3 className="font-bold text-yellow-900 mb-3 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" /> Recomendación
+            </h3>
             <p className="text-sm text-yellow-800">
               Se recomienda mantener el ritmo de desinfección y considerar capacitación adicional al
               personal para alcanzar la medalla "Espacio 100% Seguro".
