@@ -1,2 +1,25 @@
+/* frontend/src/index.css */
 @import "tailwindcss";
-html, body, #root { height: 100%; }
+
+@theme {
+  /* Fondo y texto general de la aplicación */
+  --color-background: #FFFFFF;
+  --color-foreground: #111827;
+
+  /* Colores temáticos de Bioseguridad (Paleta Global HeroUI) */
+  --color-primary: #10B981;
+  --color-primary-foreground: #FFFFFF;
+
+  --color-warning: #F59E0B;
+  --color-warning-foreground: #111827;
+
+  --color-danger: #EF4444;
+  --color-danger-foreground: #FFFFFF;
+
+  --color-success: #059669;
+  --color-success-foreground: #FFFFFF;
+  
+  /* Puedes agregar variantes adicionales si el equipo las necesita */
+  --color-light: #F3F4F6;
+  --color-dark: #111827;
+}
