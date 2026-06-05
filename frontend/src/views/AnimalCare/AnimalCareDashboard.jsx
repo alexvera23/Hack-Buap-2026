@@ -5,14 +5,13 @@ import HealthSemaphore from './components/HealthSemaphore'
 import CertificationPanel from './components/CertificationPanel'
 import { Shield, Activity, ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import Footer from '../../components/Footer' // <-- Importación limpia
+import Footer from '../../components/Footer'
 
 export default function AnimalCareDashboard() {
   const navigate = useNavigate()
-  
-  // Estado local para simular telemetría o datos de base de datos unificada
+
   const [farmData, setFarmData] = useState({
-    vectorRisk: 'Alto', // Alto, Medio, Bajo
+    vectorRisk: 'Alto',
     vaccinationProgress: 75,
     lastSanitization: '2026-06-04',
     activeOutbreaks: false
@@ -27,59 +26,59 @@ export default function AnimalCareDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 sm:p-6 transition-colors duration-200">
-      
-      {/* Barra de Navegación / Encabezado superior */}
-      <header className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-100 pb-5">
-        <div className="flex items-start gap-3">
-          <button 
-            onClick={() => navigate('/')}
-            className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors mt-1"
-            title="Volver al Selector de Sector"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 bg-warning/10 rounded text-warning">
-                <Shield className="w-6 h-6" />
-              </span>
-              <h1 className="text-2xl font-bold tracking-tight">Bioseguridad Zoosanitaria</h1>
+    <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)]">
+      <div className="bg-white shadow-sm sticky top-0 z-40 border-b border-[var(--color-light)]">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-start gap-4">
+            <button
+              onClick={() => navigate('/')}
+              className="p-2 rounded-2xl text-[var(--color-primary)] hover:bg-[var(--color-light)] transition-colors"
+              title="Volver al Selector de Sector"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
+                <span className="inline-flex items-center justify-center p-2 rounded-2xl bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+                  <Shield className="w-5 h-5" />
+                </span>
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight">Bioseguridad Zoosanitaria</h1>
+                  <p className="text-sm text-[var(--color-foreground)]/70 mt-1">Control epidemiológico, vectores y trazabilidad pecuaria</p>
+                </div>
+              </div>
             </div>
-            <p className="text-gray-500 text-sm mt-0.5">Control epidemiológico, vectores y trazabilidad pecuaria</p>
+          </div>
+
+          <div className="inline-flex items-center gap-2 rounded-full bg-[var(--color-success)]/10 px-4 py-2 text-[var(--color-success)] font-semibold text-sm shadow-sm">
+            <Activity className="w-4 h-4" />
+            Unidades Verificadas: Activas
           </div>
         </div>
-        
-        <div className="flex items-center gap-2 bg-success/10 text-success px-4 py-2 rounded-full font-semibold text-sm self-start sm:self-center">
-          <Activity className="w-4 h-4" /> Unidades Verificadas: Activas
-        </div>
-      </header>
-
-      {/* Grid del Dashboard */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Columna Operativa (Izquierda y Centro) */}
-        <div className="lg:col-span-2 flex flex-col gap-6">
-          <VectorAlerts 
-            risk={farmData.vectorRisk} 
-            onAction={handleMitigateVectors} 
-          />
-          <VaccinationSchedule 
-            progress={farmData.vaccinationProgress}
-            lastSanitization={farmData.lastSanitization}
-            onUpdateProgress={(val) => setFarmData(prev => ({ ...prev, vaccinationProgress: val }))}
-          />
-         
-        </div>
-
-        {/* Columna de Certificación y Cara al Público (Derecha) */}
-        <div className="flex flex-col gap-6">
-          <HealthSemaphore data={farmData} />
-          <CertificationPanel data={farmData} />
-        </div>
       </div>
-       <Footer modulo="Bioseguridad Zoosanitaria (Cuidado Animal)" />
+
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="grid gap-6">
+            <VectorAlerts
+              risk={farmData.vectorRisk}
+              onAction={handleMitigateVectors}
+            />
+            <VaccinationSchedule
+              progress={farmData.vaccinationProgress}
+              lastSanitization={farmData.lastSanitization}
+              onUpdateProgress={(val) => setFarmData(prev => ({ ...prev, vaccinationProgress: val }))}
+            />
+          </div>
+
+          <div className="grid gap-6">
+            <HealthSemaphore data={farmData} />
+            <CertificationPanel data={farmData} />
+          </div>
+        </div>
+
+        <Footer modulo="Bioseguridad Zoosanitaria (Cuidado Animal)" />
+      </main>
     </div>
-    
   )
 }

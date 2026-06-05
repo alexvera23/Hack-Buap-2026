@@ -5,33 +5,31 @@ export default function HealthSemaphore({ data }) {
   const isOptimal = data.vectorRisk === 'Bajo' && data.vaccinationProgress >= 80;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200/60 p-5 flex flex-col gap-4">
+    <div className="bg-[var(--color-background)] rounded-3xl shadow-sm border border-[var(--color-light)] p-6 flex flex-col gap-5">
       <div>
-        <h2 className="text-base font-bold text-foreground">Semáforo Zoosanitario de Transparencia</h2>
-        <p className="text-gray-400 text-xs">Validación pública para inspectores y puntos de venta</p>
+        <h2 className="text-base font-bold text-[var(--color-foreground)]">Semáforo Zoosanitario de Transparencia</h2>
+        <p className="text-[var(--color-foreground)]/60 text-xs mt-1">Validación pública para inspectores y puntos de venta</p>
       </div>
 
-      {/* Indicador Visual de Estatus */}
-      <div className={`p-4 rounded-xl border flex items-center justify-between transition-colors ${
-        isOptimal ? 'bg-success/5 border-success/20' : 'bg-warning/5 border-warning/20'
+      <div className={`p-4 rounded-3xl border flex items-center justify-between transition-colors ${
+        isOptimal ? 'bg-[var(--color-success)]/10 border-[var(--color-success)]/20' : 'bg-[var(--color-warning)]/10 border-[var(--color-warning)]/20'
       }`}>
         <div className="flex items-center gap-3">
           <span className={`w-3.5 h-3.5 rounded-full ${
-            isOptimal ? 'bg-success animate-pulse' : 'bg-warning animate-pulse'
+            isOptimal ? 'bg-[var(--color-success)] animate-pulse' : 'bg-[var(--color-warning)] animate-pulse'
           }`} />
-          <span className="font-bold text-xs uppercase tracking-wider">
+          <span className="font-bold text-xs uppercase tracking-wider text-[var(--color-foreground)]">
             {isOptimal ? 'Estatus Seguro' : 'Estatus Condicionado'}
           </span>
         </div>
-        <span className="text-[10px] font-mono text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
+        <span className="text-[10px] font-mono text-[var(--color-foreground)]/70 bg-[var(--color-light)] px-2 py-0.5 rounded">
           LOTE: MX-P2
         </span>
       </div>
 
-      {/* Caja de QR */}
-      <div className="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center text-center justify-center">
-        <QrCode className="w-24 h-24 text-gray-800 mb-2" />
-        <p className="text-[11px] text-gray-500 max-w-[200px] leading-relaxed">
+      <div className="bg-[var(--color-light)] border border-dashed border-[var(--color-light)] rounded-3xl p-5 flex flex-col items-center text-center justify-center">
+        <QrCode className="w-24 h-24 text-[var(--color-foreground)] mb-3" />
+        <p className="text-[11px] text-[var(--color-foreground)]/70 max-w-[220px] leading-relaxed">
           Escanea el identificador de la unidad de producción para validar la trazabilidad higiénica libre de brotes activos.
         </p>
       </div>
