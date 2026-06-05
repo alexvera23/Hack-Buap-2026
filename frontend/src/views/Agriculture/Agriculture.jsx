@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Users, QrCode, Award, BarChart3 } from 'lucide-react';
 import SupervisorDashboard from './SupervisorDashboard';
 import ClientView from './ClientView';
@@ -42,16 +43,26 @@ export default function Agriculture() {
       {/* Navigation Header */}
       <div className="bg-white shadow-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-emerald-100 rounded-lg text-emerald-700">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          <div className="relative flex flex-col mb-4">
+            <div className="mb-4">
+              <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-full transition-all border border-emerald-200">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
                 </svg>
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900">Módulo de Agricultura</h1>
+                Volver al Inicio
+              </Link>
             </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-emerald-100 rounded-lg text-emerald-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900">Módulo de Agricultura</h1>
+              </div>
             <div className="text-sm text-gray-600">Bioseguridad Fitonutricional e Inocuidad</div>
+            </div>
           </div>
 
           {/* View Selector */}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserCheck, ShieldCheck, Award, BarChart3 } from 'lucide-react';
+import { Link } from 'react-router-dom';import { UserCheck, ShieldCheck, Award, BarChart3 } from 'lucide-react';
 import SupervisorDashboard from './SupervisorDashboard';
 import ClientView from './ClientView';
 import GamificationSystem from './GamificationSystem';
@@ -42,12 +42,22 @@ export default function Health() {
       {/* Navigation Header */}
       <div className="bg-white shadow-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-6 h-6 text-green-600" />
-              <h1 className="text-3xl font-bold text-gray-900">Módulo de Salud Humana</h1>
+          <div className="flex flex-col mb-4">
+            <div className="mb-4">
+              <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 hover:text-green-900 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-full transition-all border border-green-200">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                </svg>
+                Volver al Inicio
+              </Link>
             </div>
-            <div className="text-sm text-gray-600">Bioseguridad Clínica y Comercial</div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-6 h-6 text-green-600" />
+                <h1 className="text-3xl font-bold text-gray-900">Módulo de Salud Humana</h1>
+              </div>
+              <div className="text-sm text-gray-600">Bioseguridad Clínica y Comercial</div>
+            </div>
           </div>
 
           {/* View Selector */}
